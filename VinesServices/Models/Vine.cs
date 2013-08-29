@@ -1,30 +1,59 @@
 ﻿namespace VinesServices.Models
 {
+    using System.Linq;
+    using System.Runtime.Serialization;
     using HtmlAgilityPack;
 
-    public class Vine
+    [DataContract(Name = "vine")]
+    public class Vine : VineThumbnail
     {
-        public string Title { get; set; }
+        [DataMember(Name = "previousVineUrl")]
+        public string PreviousVineUrl { get; set; }
 
-        public string VineUrl { get; set; }
+        [DataMember(Name = "nextVineUrl")]
+        public string NextVineUrl { get; set; }
 
-        public string VinePosterUrl { get; set; }
+        [DataMember(Name = "videoUrl")]
+        public string VideoUrl { get; set; }
 
-        public string Author { get; set; }
+        [DataMember(Name = "addedBefore")]
+        public string AddedBefore { get; set; }
 
-        public static Vine Parse(string html)
+        public static Vine Parse(HtmlNode node)
         {
             var vine = new Vine();
 
-            var htmlDocument = new HtmlDocument();
-            htmlDocument.LoadHtml(html);
-            var articleNode = htmlDocument.DocumentNode.SelectSingleNode("article");
-            vine.VineUrl = articleNode.SelectSingleNode("a").Attributes["href"].Value;
-            vine.Title = articleNode.SelectSingleNode("a/header/h3").InnerText;
-            vine.VinePosterUrl = articleNode.SelectSingleNode("a/div/img").Attributes["src"].Value;
-            vine.Author = articleNode.SelectSingleNode("a/footer/p").InnerText;
+            vine.Title = node.SelectSingleNode("h1").InnerText;
+            var neighbourVideos = node.SelectNodes("div/a");
+            vine.PreviousVineUrl = neighbourVideos
+                                                  .Where(n => n.Attributes["id"].Value == "prev")
+                                                  .FirstOrDefault()
+                                                  .Attributes["href"].Value;
+            vine.NextVineUrl = neighbourVideos
+                                              .Where(n => n.Attributes["id"].Value == "next")
+                                              .FirstOrDefault()
+                                              .Attributes["href"].Value;
+            vine.PosterUrl = node.SelectSingleNode("div/div/div/video").Attributes["poster"].Value;
+            vine.VideoUrl = node.SelectSingleNode("div/div/div/video/source").Attributes["src"].Value;
+            var vineDetails = node.SelectNodes("div/div/span");
+            vine.Author = vineDetails[0].InnerText.Replace("Vine By: ", string.Empty);
+            vine.AddedBefore = vineDetails[1].InnerText.Replace("Added ", string.Empty).Replace(" ago ", string.Empty);
 
             return vine;
+        }
+
+        public VineThumbnail VineThumbnail
+        {
+            get
+            {
+                return new VineThumbnail()
+                {
+                    Author = this.Author,
+                    PosterUrl = this.PosterUrl,
+                    Title = this.Title,
+                    Url = this.Url,
+                };
+            }
         }
     }
 }
