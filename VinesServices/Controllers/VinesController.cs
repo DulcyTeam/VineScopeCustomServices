@@ -5,70 +5,99 @@
     using System.IO;
     using System.Linq;
     using System.Net;
+    using System.Net.Http;
     using System.Web.Http;
-    using AttributeRouting.Web.Http;
     using HtmlAgilityPack;
     using VinesServices.Models;
 
     public class VinesController : ApiController
     {
-        private const string vineScopeUrl = "http://vinescope.com/";
+        private const string VineScopeUrl = "http://vinescope.com/";
 
-        // GET api/vines
-        //public IEnumerable<VineThumbnail> Get()
-        //{
-        //    string htmlString = VineScopeHtmlRequester();
-
-        //    var htmlDocument = new HtmlDocument();
-        //    htmlDocument.LoadHtml(htmlString);
-
-        //    var indexVideoNode = htmlDocument.GetElementbyId("container").SelectSingleNode("div");
-        //    VineThumbnail indexMainVine = Vine.Parse(indexVideoNode);
-        //    indexMainVine.Url = vineScopeUrl;
-        //    var vines = new List<VineThumbnail>();
-        //    vines.Add(indexMainVine);
-
-        //    var featuredVinesNodes = htmlDocument.GetElementbyId("container")
-        //                                         .SelectNodes("div/div/div")
-        //                                         .Where(n => n.Attributes["class"] != null && n.Attributes["class"].Value == "thumb-list")
-        //                                         .FirstOrDefault()
-        //                                         .SelectNodes("article");
-        //    foreach (var node in featuredVinesNodes)
-        //    {
-        //        var vine = VineThumbnail.Parse(node);
-        //        vines.Add(vine);
-        //    }
-
-        //    return vines;
-        //}
-
-        // GET api/vines?url={url}
-        //[HttpGet]
-        //[GET("api/vines?url={url}")]
-        public Vine GetVine(string url)
+        [HttpGet]
+        [ActionName("all")]
+        public HttpResponseMessage Get()
         {
-            string htmlString = VineScopeHtmlRequester(url);
+            string htmlString = VineScopeHtmlRequester();
+
+            if (htmlString == null)
+            {
+                return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "Server is down");
+            }
 
             var htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(htmlString);
 
             var indexVideoNode = htmlDocument.GetElementbyId("container").SelectSingleNode("div");
-            Vine vine = Vine.Parse(indexVideoNode);
+            VineThumbnail indexMainVine = Vine.Parse(indexVideoNode);
+            indexMainVine.Url = VineScopeUrl;
+            var vines = new List<VineThumbnail>();
+            vines.Add(indexMainVine);
 
-            return vine;
+            var featuredVinesNodes = htmlDocument.GetElementbyId("container")
+                                                 .SelectNodes("div/div/div")
+                                                 .Where(n => n.Attributes["class"] != null && n.Attributes["class"].Value == "thumb-list")
+                                                 .FirstOrDefault()
+                                                 .SelectNodes("article");
+            foreach (var node in featuredVinesNodes)
+            {
+                var vine = VineThumbnail.Parse(node);
+                vines.Add(vine);
+            }
+
+            return this.Request.CreateResponse(HttpStatusCode.OK, vines);
         }
 
-        // GET api/vines?search={query}
-        //[HttpGet]
-        //[GET("api/vines?search={query}")]
-        public IEnumerable<VineThumbnail> GetSearchForVine(string query)
+        [HttpGet]
+        [ActionName("vine")]
+        public HttpResponseMessage GetVine(string url)
+        {
+            string htmlString = VineScopeHtmlRequester(url);
+
+            if (htmlString == null)
+            {
+                return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "Server is down");
+            }
+
+            var htmlDocument = new HtmlDocument();
+            htmlDocument.LoadHtml(htmlString);
+
+            var indexVideoNode = htmlDocument.GetElementbyId("container").SelectSingleNode("div");
+
+            Vine vine = null;
+            
+            try
+            {
+                vine = Vine.Parse(indexVideoNode);
+            }
+            catch (Exception)
+            {
+                return this.Request.CreateErrorResponse(HttpStatusCode.NotFound, "Item was not found");
+            }
+
+            return this.Request.CreateResponse(HttpStatusCode.OK, vine);
+        }
+
+        [HttpGet]
+        [ActionName("search")]
+        public HttpResponseMessage GetSearchForVine(string query)
         {
             string htmlString = VineScopeHtmlRequester(string.Format("search.php?query={0}", query));
+
+            if (htmlString == null)
+            {
+                return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "Server is down");
+            }
 
             var htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(htmlString);
 
             var vinesNodes = htmlDocument.GetElementbyId("searchresultdata").SelectNodes("div/article");
+
+            if (vinesNodes == null)
+            {
+                return this.Request.CreateErrorResponse(HttpStatusCode.NotFound, "Item not found");
+            }
 
             var vines = new List<VineThumbnail>();
 
@@ -78,25 +107,49 @@
                 vines.Add(vine);
             }
 
-            return vines;
+            return this.Request.CreateResponse(HttpStatusCode.OK, vines);
         }
 
-        //// GET api/albums
-        //public VineFull GetRandom()
-        //{
-        //    throw new NotImplementedException();
-        //}
+        [HttpGet]
+        [ActionName("random")]
+        public HttpResponseMessage GetRandom()
+        {
+            string htmlString = VineScopeHtmlRequester("random.php");
+
+            if (htmlString == null)
+            {
+                return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "Server is down");
+            }
+
+            var htmlDocument = new HtmlDocument();
+            htmlDocument.LoadHtml(htmlString);
+
+            var indexVideoNode = htmlDocument.GetElementbyId("container").SelectSingleNode("div");
+            Vine vine = Vine.Parse(indexVideoNode);
+            vine.Url = VineScopeUrl;
+
+            return this.Request.CreateResponse(HttpStatusCode.OK, vine);
+        }
 
         private string VineScopeHtmlRequester(string resource = "")
         {
-            string htmlString = null;
+            string htmlString;
 
-            var request = WebRequest.Create(vineScopeUrl + resource) as HttpWebRequest;
+            var request = WebRequest.Create(VineScopeUrl + resource) as HttpWebRequest;
 
             request.ContentType = "application/json";
             request.Method = "GET";
 
-            var response = request.GetResponse();
+            WebResponse response;
+
+            try
+            {
+                response = request.GetResponse();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
 
             var responseReader = new StreamReader(response.GetResponseStream());
 
