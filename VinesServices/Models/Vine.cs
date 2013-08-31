@@ -19,7 +19,7 @@
         [DataMember(Name = "addedBefore")]
         public string AddedBefore { get; set; }
 
-        public static string GetUrl(Vine vine)
+        public static string GetUrl(VineThumbnail vine)
         {
             string vineUrl =  vine.PosterUrl.Substring(vine.PosterUrl.LastIndexOf("/") + 1).Replace("jpg", "html");
             return vineUrl;

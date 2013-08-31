@@ -30,7 +30,7 @@
 
             var indexVideoNode = htmlDocument.GetElementbyId("container").SelectSingleNode("div");
             VineThumbnail indexMainVine = Vine.Parse(indexVideoNode);
-            indexMainVine.Url = VineScopeUrl;
+            indexMainVine.Url = VineScopeUrl + Vine.GetUrl(indexMainVine);
             var vines = new List<VineThumbnail>();
             vines.Add(indexMainVine);
 
@@ -69,7 +69,6 @@
             try
             {
                 vine = Vine.Parse(indexVideoNode);
-                vine.Url = VineScopeUrl + Vine.GetUrl(vine);
             }
             catch (Exception)
             {
