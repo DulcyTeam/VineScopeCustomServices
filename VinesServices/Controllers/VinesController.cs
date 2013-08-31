@@ -69,6 +69,7 @@
             try
             {
                 vine = Vine.Parse(indexVideoNode);
+                vine.Url = VineScopeUrl + Vine.GetUrl(vine);
             }
             catch (Exception)
             {
@@ -126,7 +127,7 @@
 
             var indexVideoNode = htmlDocument.GetElementbyId("container").SelectSingleNode("div");
             Vine vine = Vine.Parse(indexVideoNode);
-            vine.Url = VineScopeUrl;
+            vine.Url = VineScopeUrl + Vine.GetUrl(vine);
 
             return this.Request.CreateResponse(HttpStatusCode.OK, vine);
         }
