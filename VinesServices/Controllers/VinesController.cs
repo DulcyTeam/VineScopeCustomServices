@@ -42,7 +42,7 @@
             foreach (var node in featuredVinesNodes)
             {
                 var vine = VineThumbnail.Parse(node);
-                vine.Url = vine.Url.Substring(vine.Url.LastIndexOf("/"));
+                vine.Url = vine.Url.Substring(vine.Url.LastIndexOf("/") + 1);
                 vines.Add(vine);
             }
 
@@ -105,6 +105,7 @@
             foreach (var node in vinesNodes)
             {
                 var vine = VineThumbnail.Parse(node);
+                vine.Url = vine.Url.Substring(vine.Url.LastIndexOf("/") + 1);
                 vines.Add(vine);
             }
 
