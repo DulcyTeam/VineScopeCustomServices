@@ -42,6 +42,7 @@
             foreach (var node in featuredVinesNodes)
             {
                 var vine = VineThumbnail.Parse(node);
+                vine.Url = Vine.GetUrl(vine);
                 vines.Add(vine);
             }
 
