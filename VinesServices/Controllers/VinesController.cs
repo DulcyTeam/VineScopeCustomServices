@@ -70,6 +70,7 @@
             try
             {
                 vine = Vine.Parse(indexVideoNode);
+                vine.Url = VineScopeUrl + url;
             }
             catch (Exception)
             {
