@@ -34,11 +34,11 @@
             vine.PreviousVineUrl = neighbourVideos
                                                   .Where(n => n.Attributes["id"].Value == "prev")
                                                   .FirstOrDefault()
-                                                  .Attributes["href"].Value;
+                                                  .Attributes["href"].Value.Replace("./", string.Empty);
             vine.NextVineUrl = neighbourVideos
                                               .Where(n => n.Attributes["id"].Value == "next")
                                               .FirstOrDefault()
-                                              .Attributes["href"].Value;
+                                              .Attributes["href"].Value.Replace("./", string.Empty);
             vine.PosterUrl = node.SelectSingleNode("div/div/div/video").Attributes["poster"].Value;
             vine.VideoUrl = node.SelectSingleNode("div/div/div/video/source").Attributes["src"].Value;
             var vineDetails = node.SelectNodes("div/div/span");

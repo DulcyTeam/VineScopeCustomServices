@@ -25,7 +25,7 @@
             vine.Url = node.SelectSingleNode("a").Attributes["href"].Value;
             vine.Title = node.SelectSingleNode("a/header/h3").InnerText;
             vine.PosterUrl = node.SelectSingleNode("a/div/img").Attributes["src"].Value;
-            vine.Author = node.SelectSingleNode("a/footer/p").InnerText;
+            vine.Author = node.SelectSingleNode("a/footer/p").InnerText.Replace("By ", string.Empty);
 
             return vine;
         }
