@@ -39,11 +39,12 @@
                                               .Where(n => n.Attributes["id"].Value == "next")
                                               .FirstOrDefault()
                                               .Attributes["href"].Value.Replace("./", string.Empty);
-            vine.PosterUrl = node.SelectSingleNode("div/div/div/video").Attributes["poster"].Value;
-            vine.VideoUrl = node.SelectSingleNode("div/div/div/video/source").Attributes["src"].Value;
-            var vineDetails = node.SelectNodes("div/div/span");
-            vine.Author = vineDetails[0].InnerText.Replace("Vine By: ", string.Empty);
-            vine.AddedBefore = vineDetails[1].InnerText.Replace("Added ", string.Empty).Replace(" ago ", string.Empty);
+            vine.PosterUrl = node.SelectSingleNode("div/div/video").Attributes["poster"].Value;
+            vine.VideoUrl = node.SelectSingleNode("div/div/video/source").Attributes["src"].Value;
+            var vineAuthorName = node.SelectSingleNode("div/div/div/p/strong/span").InnerText;
+            vine.Author = vineAuthorName;
+            var addedBefore = node.SelectSingleNode("div/div/span").InnerText;
+            vine.AddedBefore = addedBefore.Replace("Added ", string.Empty).Replace(" ago ", string.Empty);
 
             return vine;
         }
