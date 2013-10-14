@@ -33,14 +33,12 @@ namespace VinesServices.Areas.HelpPage
 
         public string GetDocumentation(HttpControllerDescriptor controllerDescriptor)
         {
-            // TODO: Implement this method
-            throw new NotImplementedException();
+            return GetDocumentation(controllerDescriptor);
         }
 
         public string GetResponseDocumentation(HttpActionDescriptor actionDescriptor)
         {
-            // TODO: Implement this method
-            throw new NotImplementedException();
+            return GetResponseDocumentation(actionDescriptor);
         }
 
         public virtual string GetDocumentation(HttpActionDescriptor actionDescriptor)
