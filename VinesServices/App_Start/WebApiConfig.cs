@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 
@@ -9,6 +8,8 @@ namespace VinesServices
     {
         public static void Register(HttpConfiguration config)
         {
+            config.EnableCors();
+
             config.Routes.MapHttpRoute(
                 name: "VinesApi",
                 routeTemplate: "api/vines/{action}",

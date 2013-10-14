@@ -7,9 +7,11 @@
     using System.Net;
     using System.Net.Http;
     using System.Web.Http;
+    using System.Web.Http.Cors;
     using HtmlAgilityPack;
     using VinesServices.Models;
 
+    [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class VinesController : ApiController
     {
         private const string VineScopeUrl = "http://vinescope.com/";
