@@ -31,16 +31,6 @@ namespace VinesServices.Areas.HelpPage
             _documentNavigator = xpath.CreateNavigator();
         }
 
-        public string GetDocumentation(HttpControllerDescriptor controllerDescriptor)
-        {
-            return GetDocumentation(controllerDescriptor);
-        }
-
-        public string GetResponseDocumentation(HttpActionDescriptor actionDescriptor)
-        {
-            return GetResponseDocumentation(actionDescriptor);
-        }
-
         public virtual string GetDocumentation(HttpActionDescriptor actionDescriptor)
         {
             XPathNavigator methodNode = GetMethodNode(actionDescriptor);

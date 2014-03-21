@@ -7,11 +7,9 @@
     using System.Net;
     using System.Net.Http;
     using System.Web.Http;
-    using System.Web.Http.Cors;
     using HtmlAgilityPack;
     using VinesServices.Models;
 
-    [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class VinesController : ApiController
     {
         private const string VineScopeUrl = "http://vinescope.com/";
@@ -38,7 +36,8 @@
 
             var featuredVinesNodes = htmlDocument.GetElementbyId("container")
                                                  .SelectNodes("div/div/div")
-                                                 .Where(n => n.Attributes["class"] != null && n.Attributes["class"].Value == "thumb-list")
+                                                 .Where(n => n.Attributes["class"] != null && 
+                                                     n.Attributes["class"].Value == "thumb-list")
                                                  .FirstOrDefault()
                                                  .SelectNodes("article");
             foreach (var node in featuredVinesNodes)
@@ -68,7 +67,7 @@
             var indexVideoNode = htmlDocument.GetElementbyId("container").SelectSingleNode("div");
 
             Vine vine = null;
-            
+
             try
             {
                 vine = Vine.Parse(indexVideoNode);

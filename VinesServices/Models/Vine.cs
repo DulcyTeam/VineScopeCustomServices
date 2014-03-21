@@ -21,7 +21,7 @@
 
         public static string GetUrl(VineThumbnail vine)
         {
-            string vineUrl =  vine.PosterUrl.Substring(vine.PosterUrl.LastIndexOf("/") + 1).Replace("jpg", "html");
+            string vineUrl = vine.PosterUrl.Substring(vine.PosterUrl.LastIndexOf("/") + 1).Replace("jpg", "html");
             return vineUrl;
         }
 
